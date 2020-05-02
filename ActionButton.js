@@ -16,6 +16,7 @@ import {
   touchableBackground,
   DEFAULT_ACTIVE_OPACITY
 } from "./shared";
+import * as Animatable from 'react-native-animatable';
 
 const ActionButton = props => {
   const [, setResetToken] = useState(props.resetToken);
@@ -35,13 +36,13 @@ const ActionButton = props => {
 
   useEffect(() => {
     if (props.active) {
-      Animated.spring(anim.current, { toValue: 1 }).start();
+      Animated.spring(anim.current, { toValue: 1, useNativeDriver: false}).start();
       setActive(true);
       setResetToken(props.resetToken);
     } else {
       props.onReset && props.onReset();
 
-      Animated.spring(anim.current, { toValue: 0 }).start();
+      Animated.spring(anim.current, { toValue: 0, useNativeDriver: false}).start();
       timeout.current = setTimeout(() => {
         setActive(false);
         setResetToken(props.resetToken);
@@ -54,12 +55,15 @@ const ActionButton = props => {
   //////////////////////
 
   const getOrientation = () => {
-    return { alignItems: alignItemsMap[props.position] };
+    return { 
+      alignItems: alignItemsMap[props.position],
+      flexDirection:props.orientation == "horizontal"?"row":"column",
+    };
   };
 
   const getOffsetXY = () => {
     return {
-      // paddingHorizontal: props.offsetX,
+      paddingHorizontal: props.offsetX,
       paddingVertical: props.offsetY
     };
   };
@@ -70,8 +74,8 @@ const ActionButton = props => {
       {
         elevation: props.elevation,
         zIndex: props.zIndex,
-        justifyContent:
-          props.verticalOrientation === "up" ? "flex-end" : "flex-start"
+        justifyContent: 
+          props.orientation == "vertical"? (props.verticalOrientation === "up" ? "flex-end" : "flex-start") : (props.horizontalOrientation === "right"? "flex-start": "flex-end")
       }
     ];
   };
@@ -124,12 +128,13 @@ const ActionButton = props => {
         : { marginHorizontal: props.offsetX, zIndex: props.zIndex };
 
     return (
-      <View
+      <Animatable.View
         style={[
           parentStyle,
           !props.hideShadow && shadowStyle,
           !props.hideShadow && props.shadowStyle
         ]}
+        animation={props.animate}
       >
         <Touchable
           testID={props.testID}
@@ -147,6 +152,7 @@ const ActionButton = props => {
           }}
           onPressIn={props.onPressIn}
           onPressOut={props.onPressOut}
+          style={{marginVertical:4}}
         >
           <Animated.View style={wrapperStyle}>
             <Animated.View style={[buttonStyle, animatedViewStyle]}>
@@ -154,7 +160,7 @@ const ActionButton = props => {
             </Animated.View>
           </Animated.View>
         </Touchable>
-      </View>
+      </Animatable.View>
     );
   };
 
@@ -164,7 +170,7 @@ const ActionButton = props => {
       renderIcon,
       btnOutRangeTxt,
       buttonTextStyle,
-      buttonText
+      buttonText,
     } = props;
     if (renderIcon) return renderIcon(active);
     if (icon) {
@@ -195,7 +201,7 @@ const ActionButton = props => {
   };
 
   const _renderActions = () => {
-    const { children, verticalOrientation } = props;
+    const { children, verticalOrientation, orientation, horizontalOrientation } = props;
 
     if (!active) return null;
 
@@ -207,11 +213,12 @@ const ActionButton = props => {
 
     const actionStyle = {
       flex: 1,
+      flexDirection: orientation === "vertical"? "column":"row",
       alignSelf: "stretch",
-      // backgroundColor: 'purple',
-      justifyContent: verticalOrientation === "up" ? "flex-end" : "flex-start",
-      paddingTop: props.verticalOrientation === "down" ? props.spacing : 0,
-      zIndex: props.zIndex
+      justifyContent: orientation==="vertical"?(verticalOrientation === "up" ? "flex-end" : "flex-start"):(horizontalOrientation === "right" ? "flex-start":"flex-end"),
+      paddingTop: verticalOrientation === "down" ? props.spacing : 0,
+      zIndex: props.zIndex,
+      alignItems: orientation === "vertical"?null:"flex-end",
     };
 
     return (
@@ -254,7 +261,7 @@ const ActionButton = props => {
     if (active) return reset(animate);
 
     if (animate) {
-      Animated.spring(anim.current, { toValue: 1 }).start();
+      Animated.spring(anim.current, { toValue: 1, useNativeDriver: false}).start();
     } else {
       anim.current.setValue(1);
     }
@@ -266,7 +273,7 @@ const ActionButton = props => {
     if (props.onReset) props.onReset();
 
     if (animate) {
-      Animated.spring(anim.current, { toValue: 0 }).start();
+      Animated.spring(anim.current, { toValue: 0, useNativeDriver: false}).start();
     } else {
       anim.current.setValue(0);
     }
@@ -301,11 +308,11 @@ const ActionButton = props => {
       >
         {active && !props.backgroundTappable && _renderTappableBackground()}
 
-        {props.verticalOrientation === "up" &&
+        {((props.orientation === "vertical" && props.verticalOrientation === "up") || (props.orientation === "horizontal" && props.horizontalOrientation === "left"))&&
           props.children &&
           _renderActions()}
         {_renderMainButton()}
-        {props.verticalOrientation === "down" &&
+        {((props.orientation === "vertical" && props.verticalOrientation === "down") || (props.orientation === "horizontal" && props.horizontalOrientation === "right") )&&
           props.children &&
           _renderActions()}
       </View>
@@ -348,7 +355,9 @@ ActionButton.propTypes = {
   onPressOut: PropTypes.func,
   backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
   degrees: PropTypes.number,
+  orientation:PropTypes.oneOf(["vertical", "horizontal"]),
   verticalOrientation: PropTypes.oneOf(["up", "down"]),
+  horizontalOrientation: PropTypes.oneOf(["left", "right"]),
   backgroundTappable: PropTypes.bool,
   activeOpacity: PropTypes.number,
 
@@ -358,7 +367,9 @@ ActionButton.propTypes = {
 
   testID: PropTypes.string,
   accessibilityLabel: PropTypes.string,
-  accessible: PropTypes.bool
+  accessible: PropTypes.bool,
+
+  animate: PropTypes.string,
 };
 
 ActionButton.defaultProps = {
@@ -389,7 +400,10 @@ ActionButton.defaultProps = {
   nativeFeedbackRippleColor: "rgba(255,255,255,0.75)",
   testID: undefined,
   accessibilityLabel: undefined,
-  accessible: undefined
+  accessible: undefined,
+  animate:"bounceIn",
+  orientation:"vertical",
+  horizontalOrientation:"left"
 };
 
 const styles = StyleSheet.create({

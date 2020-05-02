@@ -17,7 +17,8 @@
     "multi-action-button"
   ],
   "peerDependencies": {
-    "react-native": ">=0.11"
+    "react-native": ">=0.11",
+    "react-native-animatable": "^1.3.3"
   },
   "author": "Yousef Kamawall",
   "license": "MIT",

@@ -56,22 +56,40 @@ export default class ActionButtonItem extends Component {
       position,
       verticalOrientation,
       hideShadow,
-      spacing
+      spacing,
+      orientation,
+      anim,
+      active,
+      buttonColor,
+      btnColor,
+      parentSize,
+      useNativeFeedback,
+      fixNativeFeedbackRadius,
+      offsetX,
+      testID,
+      accessibilityLabel,
+      nativeFeedbackRippleColor,
+      activeOpacity,
+      onPress,
+      children,
+      horizontalOrientation
     } = this.props;
 
-    if (!this.props.active) return null;
+    if (!active) return null;
+
+    const translate = orientation == "vertical"? "translateY":"translateX";
 
     const animatedViewStyle = {
       marginBottom: -SHADOW_SPACE,
       alignItems: alignItemsMap[position],
 
       // backgroundColor: this.props.buttonColor,
-      opacity: this.props.anim,
+      opacity: anim,
       transform: [
         {
-          translateY: this.props.anim.interpolate({
+          [translate]: anim.interpolate({
             inputRange: [0, 1],
-            outputRange: [verticalOrientation === "down" ? -40 : 40, 0]
+            outputRange: orientation==="vertical" ? [verticalOrientation === "down" ? -40 : 40, 0] : [horizontalOrientation === "right"? -40 : 40, 0]
           })
         }
       ]
@@ -83,24 +101,26 @@ export default class ActionButtonItem extends Component {
       width: size,
       height: size,
       borderRadius: size / 2,
-      backgroundColor: this.props.buttonColor || this.props.btnColor
+      backgroundColor: buttonColor || btnColor
     };
 
     if (position !== "center")
-      buttonStyle[position] = (this.props.parentSize - size) / 2;
+      buttonStyle[position] = (parentSize - size) / 2;
 
-    const Touchable = getTouchableComponent(this.props.useNativeFeedback);
+    const Touchable = getTouchableComponent(useNativeFeedback);
 
     const parentStyle = isAndroid &&
-      this.props.fixNativeFeedbackRadius
+      fixNativeFeedbackRadius
       ? {
           height: size,
           marginBottom: spacing,
-          right: this.props.offsetX,
-          borderRadius: this.props.size / 2
+          right: offsetX,
+          borderRadius: size / 2
         }
       : {
-          paddingHorizontal: this.props.offsetX,
+          justifyContent: orientation == "vertical" ? null:"center", 
+          paddingLeft:orientation == "vertical" ? offsetX : horizontalOrientation === "left"? offsetX : 0,
+          paddingRight: orientation == "vertical" ? offsetX : horizontalOrientation === "right"? offsetX : 0,
           height: size + SHADOW_SPACE + spacing
         };
     return (
@@ -111,24 +131,24 @@ export default class ActionButtonItem extends Component {
         <View>
           <Touchable
             rejectResponderTermination
-            testID={this.props.testID}
-            accessibilityLabel={this.props.accessibilityLabel}
+            testID={testID}
+            accessibilityLabel={accessibilityLabel}
             background={touchableBackground(
-              this.props.nativeFeedbackRippleColor,
-              this.props.fixNativeFeedbackRadius
+              nativeFeedbackRippleColor,
+              fixNativeFeedbackRadius
             )}
-            activeOpacity={this.props.activeOpacity || DEFAULT_ACTIVE_OPACITY}
-            onPress={this.props.onPress}
+            activeOpacity={activeOpacity || DEFAULT_ACTIVE_OPACITY}
+            onPress={onPress}
           >
             <View style={[
               buttonStyle,
               !hideShadow ? {...shadowStyle, ...this.props.shadowStyle} : null
             ]}>
-              {this.props.children}
+              {children}
             </View>
           </Touchable>
         </View>
-        {this._renderTitle()}
+        {orientation != "horizontal" && this._renderTitle()}
       </Animated.View>
     );
   }
@@ -145,6 +165,7 @@ export default class ActionButtonItem extends Component {
       position,
       spaceBetween,
       numberOfLines,
+      orientation
     } = this.props;
     const offsetTop = Math.max(size / 2 - TEXT_HEIGHT / 2, 0);
     const positionStyles = { top: offsetTop };
@@ -152,18 +173,23 @@ export default class ActionButtonItem extends Component {
       ? this.props.hideShadow
       : hideLabelShadow;
 
-    if (position !== "center") {
-      positionStyles[position] =
-        offsetX + (parentSize - size) / 2 + size + spaceBetween;
-    } else {
-      positionStyles.right = WIDTH / 2 + size / 2 + spaceBetween;
+    if (orientation == "vertical"){
+      if (position !== "center") {
+        positionStyles[position] =
+          offsetX + (parentSize - size) / 2 + size + spaceBetween;
+      } else {
+        positionStyles.right = WIDTH / 2 + size / 2 + spaceBetween;
+      }
+    }else{
+      positionStyles = {};
     }
 
     const textStyles = [
       styles.textContainer,
       positionStyles,
       !hideShadow && shadowStyle,
-      textContainerStyle
+      textContainerStyle,
+      // {marginBottom:5}
     ];
 
     const title = (
