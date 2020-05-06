@@ -358,6 +358,7 @@ ActionButton.propTypes = {
   orientation:PropTypes.oneOf(["vertical", "horizontal"]),
   verticalOrientation: PropTypes.oneOf(["up", "down"]),
   horizontalOrientation: PropTypes.oneOf(["left", "right"]),
+  horizontalSpacing: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   backgroundTappable: PropTypes.bool,
   activeOpacity: PropTypes.number,
 
@@ -403,7 +404,8 @@ ActionButton.defaultProps = {
   accessible: undefined,
   animate:"bounceIn",
   orientation:"vertical",
-  horizontalOrientation:"left"
+  horizontalOrientation:"left",
+  horizontalSpacing:20,
 };
 
 const styles = StyleSheet.create({

@@ -72,7 +72,8 @@ export default class ActionButtonItem extends Component {
       activeOpacity,
       onPress,
       children,
-      horizontalOrientation
+      horizontalOrientation,
+      horizontalSpacing
     } = this.props;
 
     if (!active) return null;
@@ -119,8 +120,8 @@ export default class ActionButtonItem extends Component {
         }
       : {
           justifyContent: orientation == "vertical" ? null:"center", 
-          paddingLeft:orientation == "vertical" ? offsetX : horizontalOrientation === "left"? offsetX : 0,
-          paddingRight: orientation == "vertical" ? offsetX : horizontalOrientation === "right"? offsetX : 0,
+          paddingLeft:orientation == "vertical" ? offsetX : horizontalOrientation === "left"? horizontalSpacing : 0,
+          paddingRight: orientation == "vertical" ? offsetX : horizontalOrientation === "right"? horizontalSpacing : 0,
           height: size + SHADOW_SPACE + spacing
         };
     return (

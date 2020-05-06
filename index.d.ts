@@ -37,7 +37,12 @@ export interface ActionButtonProperties extends ViewProperties {
 
   useNativeFeedback?: boolean,
   fixNativeFeedbackRadius?: boolean,
-  nativeFeedbackRippleColor?: string
+  nativeFeedbackRippleColor?: string,
+  
+  animate?: 'bounceIn' | 'bounceInDown' | 'bounceInUp' |  'bounceInLeft' | 'bounceInRight',
+  orientation?: 'vertical' | 'horizontal',
+  horizontalOrientation?: 'left' | 'right',
+  horizontalSpacing?: number | string,
 }
 
 export interface ActionButtonItemProperties extends ViewProperties {
