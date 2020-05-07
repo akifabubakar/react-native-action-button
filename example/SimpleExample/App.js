@@ -98,7 +98,7 @@ const App: () => React$Node = () => {
           </View>
         </ScrollView>
 
-        <ActionButton buttonColor="rgba(231,76,60,1)" orientation={orientation} animate={animate} bgColor={'rgba(0,0,0,0.3)'} offsetX={15} offsetY={50}>
+        <ActionButton buttonColor="rgba(231,76,60,1)" orientation={orientation} animate={animate} bgColor={'rgba(0,0,0,0.3)'} offsetX={15} offsetY={50} horizontalSpacing={50} horizontalOrientation={'right'}>
           <ActionButton.Item buttonColor='#5659b6' title="Add" onPress={() => console.log("notes tapped!")}>
             <Text> Test </Text>
           </ActionButton.Item>

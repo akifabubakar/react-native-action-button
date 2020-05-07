@@ -201,7 +201,7 @@ const ActionButton = props => {
   };
 
   const _renderActions = () => {
-    const { children, verticalOrientation, orientation, horizontalOrientation } = props;
+    const { children, verticalOrientation, orientation, horizontalOrientation, horizontalSpacing, offsetX } = props;
 
     if (!active) return null;
 
@@ -219,6 +219,8 @@ const ActionButton = props => {
       paddingTop: verticalOrientation === "down" ? props.spacing : 0,
       zIndex: props.zIndex,
       alignItems: orientation === "vertical"?null:"flex-end",
+      paddingLeft: orientation == "horizontal" && horizontalOrientation === 'right' && horizontalSpacing !== null && horizontalSpacing>offsetX? horizontalSpacing - offsetX : 0,
+      paddingRight: orientation == "horizontal" && horizontalOrientation === 'left' && horizontalSpacing !== null && horizontalSpacing>offsetX? horizontalSpacing - offsetX : 0,
     };
 
     return (
@@ -405,7 +407,7 @@ ActionButton.defaultProps = {
   animate:"bounceIn",
   orientation:"vertical",
   horizontalOrientation:"left",
-  horizontalSpacing:20,
+  horizontalSpacing:null,
 };
 
 const styles = StyleSheet.create({

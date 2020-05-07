@@ -120,8 +120,8 @@ export default class ActionButtonItem extends Component {
         }
       : {
           justifyContent: orientation == "vertical" ? null:"center", 
-          paddingLeft:orientation == "vertical" ? offsetX : horizontalOrientation === "left"? horizontalSpacing : 0,
-          paddingRight: orientation == "vertical" ? offsetX : horizontalOrientation === "right"? horizontalSpacing : 0,
+          paddingLeft: orientation == "vertical" ? offsetX : horizontalOrientation === "left" && horizontalSpacing !== null? horizontalSpacing : offsetX,
+          paddingRight: orientation == "vertical" ? offsetX : horizontalOrientation === "right" && horizontalSpacing !== null? horizontalSpacing : offsetX,
           height: size + SHADOW_SPACE + spacing
         };
     return (
